@@ -1,10 +1,19 @@
 use std::iter::Map;
 use std::path::PathBuf;
 use std::{env, fs};
+use rayon::prelude::*;
 
 use image::{imageops, DynamicImage, ImageBuffer};
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
+
+#[derive(Serialize, Deserialize, Debug)]
+struct Config {
+    version: u16,
+    order: Vec<String>,
+    input_size: u32,
+    output_size: u32,
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct ArtLayerMeta {
@@ -116,41 +125,24 @@ impl ArtLayer {
     }
 }
 
-fn combine_images(images: &Vec<(&ArtLayerElement, &ArtLayerMeta)>) -> DynamicImage {
+fn combine_images(images: &Vec<(&ArtLayerElement, &ArtLayerMeta)>, config: &Config) -> DynamicImage {
     // Create a new image buffer
     // Iterate over each image
     // Copy the image into the new image buffer
     // Return the new image buffer
 
-    // TODO: config ?
-    let max_width = images
-        .iter()
-        .map(|image| image.0.image.width())
-        .max()
-        .unwrap();
-    let max_height = images
-        .iter()
-        .map(|image| image.0.image.height())
-        .max()
-        .unwrap();
-
-    // TODO: config ?
-    let mut combined_image = ImageBuffer::new(max_width, max_height);
+    let mut combined_image = ImageBuffer::new(config.input_size, config.input_size);
 
     for (element, meta) in images {
         let image = &element.image;
         let x_offset = meta.x_offset;
         let y_offset = meta.y_offset;
 
-        println!(
-            "Overlaying image: {:?} on x: {:?} y: {:?}",
-            element.name, x_offset, y_offset
-        );
-
         imageops::overlay(&mut combined_image, image, x_offset, y_offset);
     }
 
     let combined_image = DynamicImage::ImageRgba8(combined_image);
+    combined_image.resize(config.output_size, config.output_size, imageops::FilterType::Nearest);
     combined_image
 }
 
@@ -165,14 +157,17 @@ fn create_combination(collections: Vec<&ArtLayer>) -> Vec<Vec<(&ArtLayerElement,
 }
 
 fn main() {
-    // Read all folder in the /resources/input folder
-    // For each folder, read the _meta.json file
-    // That will contain the meta data of the collection
-    // Read all the .png files in the folder, those are the elements
-
     let manifest_dir = env!("CARGO_MANIFEST_DIR");
     let manifest_dir = PathBuf::from(manifest_dir);
     let input_folder = &manifest_dir.join("resources/input");
+
+    let config_path = &manifest_dir.join("resources/config.json");
+    let config = serde_json::from_str::<Config>(
+        &fs::read_to_string(config_path).expect("Error reading config file"),
+    ).expect("Error parsing config file");
+
+    // config
+
     let folders = fs::read_dir(input_folder).expect("Error reading input folder");
 
     let output_folder = &manifest_dir.join("resources/output");
@@ -203,11 +198,11 @@ fn main() {
     let combinations = create_combination(layers.iter().collect());
 
     // Combine all images
-    for (index, combination) in combinations.iter().enumerate() {
-        let image = combine_images(combination);
+    combinations.par_iter().enumerate().for_each(|(index, combination)| {
+        let image = combine_images(combination, &config);
         let file_name = format!("{}.png", index);
         let file_path = output_folder.join(file_name);
         image.save(file_path).expect("Error saving image");
         println!("Saved image {}", index);
-    }
+    });
 }
