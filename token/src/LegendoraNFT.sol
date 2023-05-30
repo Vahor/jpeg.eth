@@ -3,11 +3,11 @@ pragma solidity ^0.8.20;
 
 import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {ERC721Enumerable} from "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import {Ownable} from"openzeppelin-contracts/contracts/access/Ownable.sol";
+import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS, SAME_ACTIVE_STATE_MSG} from "./constants.sol";
 
 
-contract MythNFT is ERC721Enumerable, Ownable {
+contract LegendoraNFT is ERC721Enumerable, Ownable {
     uint256 public constant price = 1 ether;
     uint8 public constant maxPerDayAndUser = 1;
     uint8 public constant maxPerDay = 100;
@@ -19,9 +19,9 @@ contract MythNFT is ERC721Enumerable, Ownable {
 
     bool public saleIsActive = false;
 
-    constructor() ERC721("Myth", "MYTH") {}
+    constructor() ERC721("Legendora", "MYTH") {}
 
-    function _baseURI() override view internal returns(string memory) {
+    function _baseURI() override view internal returns (string memory) {
         return baseURI;
     }
 

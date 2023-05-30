@@ -5,22 +5,22 @@ import {Test, stdStorage, StdStorage} from "forge-std/Test.sol";
 import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
-import {MythNFT} from "../src/MythNFT.sol";
+import {LegendoraNFT} from "../src/LegendoraNFT.sol";
 import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS, ONLY_OWNER_MSG} from "../src/constants.sol";
 
-contract MythNFTTest is Test {
+contract LegendoraNFTTest is Test {
     using Strings for uint256;
 
     using stdStorage for StdStorage;
 
-    MythNFT private token;
+    LegendoraNFT private token;
 
     address private owner = makeAddr("owner");
     address private user = makeAddr("user");
 
     function setUp() public {
         vm.startPrank(owner);
-        token = new MythNFT();
+        token = new LegendoraNFT();
         vm.stopPrank();
     }
 
