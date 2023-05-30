@@ -26,7 +26,9 @@ contract MythNFT is ERC721, Ownable {
     }
 
     function rounded_to_day() private view returns (uint256) {
-        return block.timestamp - (block.timestamp % DAY_MS);
+        unchecked {
+            return block.timestamp - (block.timestamp % DAY_MS);
+        }
     }
 
     function mintedTodayGlobal() public view returns (uint8)  {
