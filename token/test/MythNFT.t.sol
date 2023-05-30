@@ -8,7 +8,9 @@ import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 import {MythNFT} from "../src/MythNFT.sol";
 import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS} from "../src/constants.sol";
 
-contract TestNFTTest is Test {
+contract MythNFTTest is Test {
+    using Strings for uint256;
+
     using stdStorage for StdStorage;
 
     MythNFT private token;
@@ -39,9 +41,10 @@ contract TestNFTTest is Test {
         vm.stopPrank();
     }
 
-    function open() private {
+    function open() public {
         vm.startPrank(owner);
         token.setActive(true);
+        assertEq(token.saleIsActive(), true);
         vm.stopPrank();
     }
 
@@ -60,6 +63,7 @@ contract TestNFTTest is Test {
         assertEq(user.balance, price1 * max - price1);
         assertEq(token.mintedTodayUser(user), 1);
         assertEq(token.mintedTodayGlobal(), 1);
+        assertEq(token.balanceOf(user), 1);
 
         vm.expectRevert(abi.encodePacked(MAX_DAILY_USER_MSG));
         token.purchase{value: price1}();
@@ -69,7 +73,7 @@ contract TestNFTTest is Test {
         assertEq(token.mintedTodayGlobal(), 0);
 
         for (uint256 i = 0; i < token.MAX_PER_DAY(); i++) {
-            address u = makeAddr(Strings.toString(i));
+            address u = makeAddr(i.toString());
             vm.startPrank(u);
             vm.deal(u, token.PRICE());
             token.purchase{value: price1}();
@@ -83,6 +87,28 @@ contract TestNFTTest is Test {
         vm.expectRevert(abi.encodePacked(MAX_DAILY_MSG));
         token.purchase{value: price1}();
         vm.stopPrank();
+
+    }
+
+    function test_uri() public  {
+        open();
+
+        string memory baseURI = "https://test.com/";
+        vm.startPrank(owner);
+        token.setBaseURI(baseURI);
+        assertEq(token.baseURI(), baseURI);
+        vm.stopPrank();
+
+        uint price1 = token.PRICE();
+        startHoax(user, price1);
+        token.purchase{value: price1}();
+
+        uint256 ownedTokens = token.balanceOf(user);
+        for(uint256 i = 0; i < ownedTokens; i++) {
+            uint256 ownedToken = token.tokenOfOwnerByIndex(user, i);
+            string memory a = token.tokenURI(ownedToken);
+            assertEq(a, string(abi.encodePacked(baseURI, i.toString())));
+        }
 
     }
 
