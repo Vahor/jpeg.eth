@@ -6,7 +6,7 @@ import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {Strings} from "openzeppelin-contracts/contracts/utils/Strings.sol";
 
 import {MythNFT} from "../src/MythNFT.sol";
-import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS} from "../src/constants.sol";
+import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS, ONLY_OWNER_MSG} from "../src/constants.sol";
 
 contract MythNFTTest is Test {
     using Strings for uint256;
@@ -109,6 +109,19 @@ contract MythNFTTest is Test {
             string memory a = token.tokenURI(ownedToken);
             assertEq(a, string(abi.encodePacked(baseURI, i.toString())));
         }
+
+    }
+
+    function test_withdraw() public {
+        uint money = 100;
+        startHoax(address(token), money);
+        vm.expectRevert(abi.encodePacked(ONLY_OWNER_MSG));
+        token.withdraw();
+        assertEq(address(token).balance, money);
+
+        vm.startPrank(owner);
+        token.withdraw();
+        assertEq(address(token).balance, 0);
 
     }
 
