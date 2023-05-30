@@ -2,15 +2,15 @@
 pragma solidity ^0.8.20;
 
 import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
-import {ERC721Enumerable } from "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {ERC721Enumerable} from "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {Ownable} from"openzeppelin-contracts/contracts/access/Ownable.sol";
-import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS} from "./constants.sol";
+import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS, SAME_ACTIVE_STATE_MSG} from "./constants.sol";
 
 
-contract MythNFT is ERC721Enumerable, Ownable  {
-    uint256 public constant PRICE = 1 ether;
-    uint8 public constant MAX_PER_DAY_USER = 1;
-    uint8 public constant MAX_PER_DAY = 100;
+contract MythNFT is ERC721Enumerable, Ownable {
+    uint256 public constant price = 1 ether;
+    uint8 public constant maxPerDayAndUser = 1;
+    uint8 public constant maxPerDay = 100;
 
     string public baseURI;
 
@@ -58,12 +58,12 @@ contract MythNFT is ERC721Enumerable, Ownable  {
 
     function purchase() external payable {
         require(saleIsActive, NOT_OPEN_MSG);
-        require(msg.value >= PRICE, POOR_MSG);
+        require(msg.value >= price, POOR_MSG);
 
         uint256 day = rounded_to_day();
 
-        require(_mintedTodayGlobal(day) < MAX_PER_DAY, MAX_DAILY_MSG);
-        require(_mintedTodayUser(msg.sender, day) < MAX_PER_DAY_USER, MAX_DAILY_USER_MSG);
+        require(_mintedTodayGlobal(day) < maxPerDay, MAX_DAILY_MSG);
+        require(_mintedTodayUser(msg.sender, day) < maxPerDayAndUser, MAX_DAILY_USER_MSG);
 
         _safeMint(msg.sender, totalSupply());
 
@@ -72,7 +72,7 @@ contract MythNFT is ERC721Enumerable, Ownable  {
     }
 
     function setActive(bool state) public onlyOwner {
-        require(state != saleIsActive, "Already in this state");
+        require(state != saleIsActive, SAME_ACTIVE_STATE_MSG);
         saleIsActive = state;
     }
 

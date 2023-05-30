@@ -36,8 +36,8 @@ contract MythNFTTest is Test {
         vm.expectRevert(abi.encodePacked(POOR_MSG));
         token.purchase{value: 0}();
 
-        vm.deal(user, token.PRICE());
-        token.purchase{value: token.PRICE()}();
+        vm.deal(user, token.price());
+        token.purchase{value: token.price()}();
         vm.stopPrank();
     }
 
@@ -53,9 +53,9 @@ contract MythNFTTest is Test {
         assertEq(token.mintedTodayUser(user), 0);
 
         open();
-        uint price1 = token.PRICE();
+        uint price1 = token.price();
 
-        uint max = token.MAX_PER_DAY();
+        uint max = token.maxPerDay();
         startHoax(user, price1 * max);
         assertEq(user.balance, price1 * max);
 
@@ -72,15 +72,15 @@ contract MythNFTTest is Test {
         assertEq(token.mintedTodayUser(user), 0);
         assertEq(token.mintedTodayGlobal(), 0);
 
-        for (uint256 i = 0; i < token.MAX_PER_DAY(); i++) {
+        for (uint256 i = 0; i < token.maxPerDay(); i++) {
             address u = makeAddr(i.toString());
             vm.startPrank(u);
-            vm.deal(u, token.PRICE());
+            vm.deal(u, token.price());
             token.purchase{value: price1}();
             vm.stopPrank();
         }
 
-        assertEq(token.mintedTodayGlobal(), token.MAX_PER_DAY());
+        assertEq(token.mintedTodayGlobal(), token.maxPerDay());
 
 
         vm.startPrank(user);
@@ -99,7 +99,7 @@ contract MythNFTTest is Test {
         assertEq(token.baseURI(), baseURI);
         vm.stopPrank();
 
-        uint price1 = token.PRICE();
+        uint price1 = token.price();
         startHoax(user, price1);
         token.purchase{value: price1}();
 
