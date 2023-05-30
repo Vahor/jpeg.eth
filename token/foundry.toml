@@ -1,0 +1,19 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.20"
+bytecode_hash = "none"
+cbor_metadata = false
+
+[profile.default.fuzz]
+runs = 256
+
+[profile.ci.fuzz]
+runs = 5_000
+
+[fmt]
+line_length = 100
+tab_width = 2
+bracket_spacing = true
+
