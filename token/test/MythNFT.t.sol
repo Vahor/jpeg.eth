@@ -11,11 +11,10 @@ import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS} from 
 contract TestNFTTest is Test {
     using stdStorage for StdStorage;
 
-    MythNFT token;
+    MythNFT private token;
 
-    address owner = makeAddr("owner");
-    address user = makeAddr("user");
-
+    address private owner = makeAddr("owner");
+    address private user = makeAddr("user");
 
     function setUp() public {
         vm.startPrank(owner);

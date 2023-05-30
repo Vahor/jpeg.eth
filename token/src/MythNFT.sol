@@ -7,7 +7,7 @@ import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS} from 
 
 
 contract MythNFT is ERC721, Ownable {
-    uint16 public totalSupply = 0;
+    uint32 public totalSupply = 0;
 
     uint256 public constant PRICE = 1 ether;
     uint8 public constant MAX_PER_DAY_USER = 1;
@@ -35,19 +35,29 @@ contract MythNFT is ERC721, Ownable {
         return mintedOnDay[rounded_to_day()];
     }
 
+    function _mintedTodayGlobal(uint256 day) private view returns (uint8)  {
+        return mintedOnDay[day];
+    }
+
     function mintedTodayUser(address who) public view returns (uint8)  {
         return mintedOnDayUser[who][rounded_to_day()];
     }
 
+    function _mintedTodayUser(address who, uint256 day) private view returns (uint8)  {
+        return mintedOnDayUser[who][day];
+    }
+
     function purchase() external payable {
         require(saleIsActive, NOT_OPEN_MSG);
-        require(mintedTodayGlobal() < MAX_PER_DAY, MAX_DAILY_MSG);
-        require(mintedTodayUser(msg.sender) < MAX_PER_DAY_USER, MAX_DAILY_USER_MSG);
         require(msg.value >= PRICE, POOR_MSG);
+
+        uint256 day = rounded_to_day();
+
+        require(_mintedTodayGlobal(day) < MAX_PER_DAY, MAX_DAILY_MSG);
+        require(_mintedTodayUser(msg.sender, day) < MAX_PER_DAY_USER, MAX_DAILY_USER_MSG);
 
         _safeMint(msg.sender, ++totalSupply);
 
-        uint256 day = rounded_to_day();
         mintedOnDay[day]++;
         mintedOnDayUser[msg.sender][day]++;
     }
