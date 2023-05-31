@@ -1,11 +1,5 @@
 {
   "version": 1,
-  "order": [
-    "background",
-    "circle",
-    "moon",
-    "ornament"
-  ],
   "input_size": 3000,
   "output_size": 720
 }
