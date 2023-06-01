@@ -12,7 +12,8 @@ import {
   MAX_DAILY_MSG,
   MAX_DAILY_USER_MSG,
   MS_PER_DAY,
-  ONLY_OWNER_MSG
+  ONLY_OWNER_MSG,
+  SAME_ACTIVE_STATE_MSG
 } from "../src/constants.sol";
 
 contract JPEFNFTTtest is Test {
@@ -126,5 +127,16 @@ contract JPEFNFTTtest is Test {
     vm.startPrank(owner);
     token.withdraw();
     assertEq(address(token).balance, 0);
+  }
+
+  function test_already_open() public {
+    vm.startPrank(owner);
+    vm.expectRevert(abi.encodePacked(SAME_ACTIVE_STATE_MSG));
+    token.setOpen(false);
+    token.setOpen(true);
+    assertEq(token.isOpen(), true);
+    vm.expectRevert(abi.encodePacked(SAME_ACTIVE_STATE_MSG));
+    token.setOpen(true);
+    vm.stopPrank();
   }
 }
