@@ -1,8 +1,8 @@
-use std::collections::HashMap;
 
 use image::{imageops, DynamicImage, ImageBuffer};
 use itertools::Itertools;
 use sha2::{Digest, Sha256};
+use serde::{Serialize};
 
 use crate::layer::{ArtLayer, ArtLayerElement, ArtLayerMeta};
 use crate::Config;
@@ -13,7 +13,13 @@ pub struct OutputImage {
     /// The image itself
     pub image: DynamicImage,
     /// The attributes of the image
-    pub attributes: HashMap<String, String>,
+    pub attributes: Vec<Attribute>,
+}
+
+#[derive(Serialize)]
+pub struct Attribute {
+    pub trait_type: String,
+    pub value: String,
 }
 
 /// Take multiple layers and combine them into a single image.
@@ -60,7 +66,12 @@ pub fn combine_images(
     hasher.update(format!("{:?}", attributes).as_bytes());
     let hash = hasher.finalize();
 
-    let attributes: HashMap<String, String> = HashMap::from_iter(attributes);
+    let attributes: Vec<Attribute> = attributes.into_iter().map(|(k, v)| {
+        Attribute {
+            trait_type: k,
+            value: v,
+        }
+    }).collect();
 
     OutputImage {
         hash: format!("{:x}", hash),

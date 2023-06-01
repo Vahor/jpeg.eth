@@ -14,6 +14,7 @@ mod db;
 mod env_helpers;
 pub mod image;
 mod listener;
+mod image_routes;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -47,7 +48,9 @@ async fn main() -> io::Result<()> {
             App::new()
                 .wrap(middleware::Logger::default())
                 .app_data(web::Data::new(pool.clone()))
-                .service(image::get_metadata)
+                .service(image_routes::get_metadata)
+                .service(image_routes::get_image)
+                .service(image_routes::get_all)
         }
     })
     .bind((host, port))?

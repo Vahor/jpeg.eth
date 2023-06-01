@@ -1,9 +1,8 @@
-use std::collections::{BTreeMap, HashMap};
 use std::path::PathBuf;
 
-use actix_web::{get, web, Error as AWError, HttpResponse};
-use log::{debug, info, warn};
-use serde::{Serialize, Serializer};
+use fake::faker::lorem::en::{Paragraph, Word};
+use fake::Fake;
+use serde::{Deserialize, Serialize, Serializer};
 
 use db::Pool;
 
@@ -13,54 +12,37 @@ use crate::db::register_image;
 #[derive(Serialize)]
 pub struct Image {
     pub image_id: String,
-    #[serde(serialize_with = "ordered_map")]
-    pub attributes: HashMap<String, String>,
+    pub attributes: Vec<Attribute>,
+    pub name: String,
+    pub description: String,
 }
 
-fn ordered_map<S>(value: &HashMap<String, String>, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Attribute {
+    pub trait_type: String,
+    pub value: String,
+}
+
+#[derive(Serialize, Debug)]
+pub struct ImageMetadata {
+    pub description: String,
+    pub external_url: String,
+    pub image: String,
+    pub name: String,
+    #[serde(serialize_with = "ordered_list")]
+    pub attributes: Vec<Attribute>,
+}
+
+fn ordered_list<S>(value: &Vec<Attribute>, serializer: S) -> Result<S::Ok, S::Error>
+where
+    S: Serializer,
 {
-    let ordered: BTreeMap<_, _> = value.iter().collect();
-    ordered.serialize(serializer)
-}
-
-
-#[get("/data")]
-pub async fn get_all(
-    pool: web::Data<Pool>,
-) -> Result<HttpResponse, AWError> {
-    let result = db::get_all_images(&pool.get().unwrap());
-
-    if result.is_err() {
-        let err = result.err().unwrap();
-        debug!("Error: {:?}", err);
-        return Ok(HttpResponse::NotFound().json("Not found"));
+    let mut ordered = vec![];
+    for attribute in value {
+        ordered.push(attribute);
     }
-
-    let result = result.unwrap();
-    Ok(HttpResponse::Ok().json(result))
-}
-
-#[get("/data/{nft_id}")]
-pub async fn get_metadata(
-    pool: web::Data<Pool>,
-    path: web::Path<String>,
-) -> Result<HttpResponse, AWError> {
-    let result = db::get_image(&pool.get().unwrap(), path.as_str());
-
-    if result.is_err() {
-        let err = result.err().unwrap();
-        warn!("Error while querying image for token {}", path);
-        debug!("Error: {:?}", err);
-        return Ok(HttpResponse::NotFound().json("Not found"));
-    }
-
-    let result = result.unwrap();
-
-    info!("result: {:?}", &result.attributes);
-
-    Ok(HttpResponse::Ok().json(result))
+    ordered.sort_by(|a, b| a.trait_type.cmp(&b.trait_type));
+    return ordered.serialize(serializer);
 }
 
 pub fn load_images(pool: &Pool) {
@@ -90,8 +72,17 @@ pub fn load_images(pool: &Pool) {
 
                 let attributes = std::fs::read_to_string(attributes_path).unwrap();
 
-                register_image(&pool.get().unwrap(), image_id.parse().unwrap(), attributes)
-                    .expect("Error inserting image in db");
+                let fake_name = Word().fake();
+                let fake_description = Paragraph(2..5).fake();
+
+                register_image(
+                    &pool.get().unwrap(),
+                    image_id.parse().unwrap(),
+                    attributes,
+                    fake_name,
+                    fake_description,
+                )
+                .expect("Error inserting image in db");
             }
         }
     }

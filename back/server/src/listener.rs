@@ -18,13 +18,14 @@ abigen!(
 
 pub async fn start_listener(pool: Pool) -> Result<()> {
     let host = cast_required_env_var::<String>("WSS_URL");
+    let contract_address = cast_required_env_var::<String>("CONTRACT_ADDRESS");
 
     let client: Provider<Ws> = Provider::<Ws>::connect(host).await?;
     let client = Arc::new(client);
 
     let event =
         Contract::event_of_type::<TransferFilter>(client).address(ValueOrArray::Array(vec![
-            "0xB0377814cAC67bece4CD3a5C5319BE2368Ce21df"
+            contract_address
                 .parse()
                 .unwrap(),
         ]));
@@ -38,12 +39,12 @@ pub async fn start_listener(pool: Pool) -> Result<()> {
         let to = format!("{:#x}", event.to);
         let token_id = event.token_id.to_string();
 
-        println!("New transfer: to: {to}, token_id: {token_id}",);
+        info!("New transfer: to: {to}, token_id: {token_id}",);
 
         // save to db
         let conn = pool.get()?;
         let random_id = get_random_unassigned_image(&conn)?;
-        println!("Assigned image {} to {} with nft id {}", &random_id, &to, &token_id);
+        info!("Assigned image {} to {} with token id {}", &random_id, &to, &token_id);
         assign_image(&conn, token_id, random_id)?;
     }
 
