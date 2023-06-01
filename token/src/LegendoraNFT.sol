@@ -66,7 +66,7 @@ contract LegendoraNFT is ERC721Enumerable, Ownable {
     }
 
     function purchase() external payable {
-        require(saleIsActive, NOT_OPEN_MSG);
+        require(isOpen, NOT_OPEN_MSG);
         require(msg.value >= price, POOR_MSG);
 
         uint256 day = rounded_to_day();

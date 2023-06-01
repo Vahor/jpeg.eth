@@ -25,7 +25,7 @@ contract LegendoraNFTTest is Test {
     }
 
     function test_isActive() public {
-        assertEq(token.saleIsActive(), false);
+        assertEq(token.isOpen(), false);
 
         vm.expectRevert(abi.encodePacked(NOT_OPEN_MSG));
         token.purchase();
@@ -44,7 +44,7 @@ contract LegendoraNFTTest is Test {
     function open() public {
         vm.startPrank(owner);
         token.setActive(true);
-        assertEq(token.saleIsActive(), true);
+        assertEq(token.isOpen(), true);
         vm.stopPrank();
     }
 
