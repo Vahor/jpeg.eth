@@ -19,8 +19,6 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
 
     bool public isOpen = false;
 
-    uint256 private lastComputedDay = 0;
-
     constructor() ERC721("Magnificient Image", "JPEG") {}
 
     function _baseURI() override view internal returns (string memory) {
