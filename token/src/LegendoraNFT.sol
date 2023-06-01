@@ -17,7 +17,7 @@ contract LegendoraNFT is ERC721Enumerable, Ownable {
     mapping(uint256 => uint8) public mintedOnDay;
     mapping(address => mapping(uint256 => uint8)) public mintedOnDayUser;
 
-    bool public saleIsActive = false;
+    bool public isOpen = false;
 
     constructor() ERC721("Legendora", "MYTH") {}
 
@@ -80,9 +80,9 @@ contract LegendoraNFT is ERC721Enumerable, Ownable {
         mintedOnDayUser[msg.sender][day]++;
     }
 
-    function setActive(bool state) public onlyOwner {
-        require(state != saleIsActive, SAME_ACTIVE_STATE_MSG);
-        saleIsActive = state;
+    function setOpen(bool state) public onlyOwner {
+        require(state != isOpen, SAME_ACTIVE_STATE_MSG);
+        isOpen = state;
     }
 
 
