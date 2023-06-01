@@ -1,0 +1,6 @@
+target
+generator/resources/output
+generator/resources/variants.afdesign
+server/resources/app.db
+test.sh
+back.tar

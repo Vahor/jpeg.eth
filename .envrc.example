@@ -1,0 +1,11 @@
+export API_URL=https://eth-sepolia.g.alchemy.com/v2/<API_KEY>
+export API_KEY=<API_KEY>
+
+export ETHERSCAN_API_KEY=
+export PRIVATE_KEY=
+
+export CONTRACT_ADDRESS=0xB0377814cAC67bece4CD3a5C5319BE2368Ce21df
+export WSS_URL=wss://eth-sepolia.g.alchemy.com/v2/<API_KEY>
+export DOMAIN=https://bc1a-2a01-e0a-1a8-bb90-b1cc-4da3-5788-236c.ngrok-free.app
+
+export RESOURCE_DIR=./resources

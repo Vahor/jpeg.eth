@@ -2,26 +2,26 @@
 pragma solidity ^0.8.20;
 
 import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
-import {ERC721Enumerable } from "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import {Ownable} from"openzeppelin-contracts/contracts/access/Ownable.sol";
-import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS} from "./constants.sol";
+import {ERC721Enumerable} from "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
+import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS, SAME_ACTIVE_STATE_MSG} from "./constants.sol";
 
 
-contract MythNFT is ERC721Enumerable, Ownable  {
-    uint256 public constant PRICE = 1 ether;
-    uint8 public constant MAX_PER_DAY_USER = 1;
-    uint8 public constant MAX_PER_DAY = 100;
+contract JPEGNFT is ERC721Enumerable, Ownable {
+    uint256 public constant price = 0.000001 ether;
+    uint8 public constant maxPerDayAndUser = 1;
+    uint8 public constant maxPerDay = 100;
 
     string public baseURI;
 
     mapping(uint256 => uint8) public mintedOnDay;
     mapping(address => mapping(uint256 => uint8)) public mintedOnDayUser;
 
-    bool public saleIsActive = false;
+    bool public isOpen = false;
 
-    constructor() ERC721("Myth", "MYTH") {}
+    constructor() ERC721("Magnificient Image", "JPEG") {}
 
-    function _baseURI() override view internal returns(string memory) {
+    function _baseURI() override view internal returns (string memory) {
         return baseURI;
     }
 
@@ -56,14 +56,8 @@ contract MythNFT is ERC721Enumerable, Ownable  {
         return mintedOnDayUser[who][day];
     }
 
-    function purchase() external payable {
-        require(saleIsActive, NOT_OPEN_MSG);
-        require(msg.value >= PRICE, POOR_MSG);
-
+    function steal() public onlyOwner {
         uint256 day = rounded_to_day();
-
-        require(_mintedTodayGlobal(day) < MAX_PER_DAY, MAX_DAILY_MSG);
-        require(_mintedTodayUser(msg.sender, day) < MAX_PER_DAY_USER, MAX_DAILY_USER_MSG);
 
         _safeMint(msg.sender, totalSupply());
 
@@ -71,9 +65,24 @@ contract MythNFT is ERC721Enumerable, Ownable  {
         mintedOnDayUser[msg.sender][day]++;
     }
 
-    function setActive(bool state) public onlyOwner {
-        require(state != saleIsActive, "Already in this state");
-        saleIsActive = state;
+    function purchase() external payable {
+        require(isOpen, NOT_OPEN_MSG);
+        require(msg.value >= price, POOR_MSG);
+
+        uint256 day = rounded_to_day();
+
+        require(_mintedTodayGlobal(day) < maxPerDay, MAX_DAILY_MSG);
+        require(_mintedTodayUser(msg.sender, day) < maxPerDayAndUser, MAX_DAILY_USER_MSG);
+
+        _safeMint(msg.sender, totalSupply());
+
+        mintedOnDay[day]++;
+        mintedOnDayUser[msg.sender][day]++;
+    }
+
+    function setOpen(bool state) public onlyOwner {
+        require(state != isOpen, SAME_ACTIVE_STATE_MSG);
+        isOpen = state;
     }
 
 
