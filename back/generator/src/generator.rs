@@ -8,11 +8,15 @@ use crate::layer::{ArtLayer, ArtLayerElement, ArtLayerMeta};
 use crate::Config;
 
 pub struct OutputImage {
+    /// The hash of the attributes of the image
     pub hash: String,
+    /// The image itself
     pub image: DynamicImage,
+    /// The attributes of the image
     pub attributes: HashMap<String, String>,
 }
 
+/// Take multiple layers and combine them into a single image.
 pub fn combine_images(
     images: &Vec<(&ArtLayerElement, &ArtLayerMeta)>,
     config: &Config,
@@ -34,8 +38,7 @@ pub fn combine_images(
         imageops::FilterType::Nearest,
     );
 
-    // sort the attributes by key, then join them into a string, then hash the string
-
+    // We want to sort the attributes so that the hash is always the same
     let attributes = images
         .into_iter()
         .map(|(element, _)| {
@@ -66,6 +69,9 @@ pub fn combine_images(
     }
 }
 
+/// Return all possible combinations for the given collections
+///
+/// Ex: [['red background', 'blue background'], ['red circle', 'blue circle']] => [['red background', 'red circle'], ['red background', 'blue circle'], ['blue background', 'red circle'], ['blue background', 'blue circle']]
 pub fn create_combination(
     collections: Vec<&ArtLayer>,
 ) -> Vec<Vec<(&ArtLayerElement, &ArtLayerMeta)>> {

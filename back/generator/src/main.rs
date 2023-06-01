@@ -28,8 +28,6 @@ fn main() {
     )
     .expect("Error parsing config file");
 
-    // config
-
     let folders = fs::read_dir(input_folder).expect("Error reading input folder");
 
     let output_folder = &manifest_dir.join("resources/output");
@@ -37,7 +35,7 @@ fn main() {
 
     let mut layers = Vec::new();
 
-    // Iterate over each folder
+    // Read all layers
     for folder in folders {
         if let Ok(folder_entry) = folder {
             // Skip if it's not a folder
@@ -63,15 +61,13 @@ fn main() {
     combinations.par_iter().for_each(|combination| {
         let image = combine_images(combination, &config);
         let image_path = output_folder.join(format!("{}.png", image.hash));
+        let json_path = output_folder.join(format!("{}.json", image.hash));
+
+        let attribute_str =
+            serde_json::to_string(&image.attributes).expect("Error serializing attributes");
 
         image.image.save(image_path).expect("Error saving image");
-        // Add .json for the attributes
-        let json_path = output_folder.join(format!("{}.json", image.hash));
-        fs::write(
-            json_path,
-            serde_json::to_string(&image.attributes).expect("Error serializing attributes"),
-        )
-        .expect("Error saving image attributes");
+        fs::write(json_path, attribute_str).expect("Error saving image attributes");
 
         println!("Saved image {}", image.hash);
     });
