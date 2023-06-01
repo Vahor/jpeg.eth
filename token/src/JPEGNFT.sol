@@ -7,8 +7,8 @@ import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
 import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS, SAME_ACTIVE_STATE_MSG} from "./constants.sol";
 
 
-contract LegendoraNFT is ERC721Enumerable, Ownable {
-    uint256 public constant price = 1 ether;
+contract JPEGNFT is ERC721Enumerable, Ownable {
+    uint256 public constant price = 0.000001 ether;
     uint8 public constant maxPerDayAndUser = 1;
     uint8 public constant maxPerDay = 100;
 
@@ -19,7 +19,7 @@ contract LegendoraNFT is ERC721Enumerable, Ownable {
 
     bool public isOpen = false;
 
-    constructor() ERC721("Legendora", "MYTH") {}
+    constructor() ERC721("Magnificient Image", "JPEG") {}
 
     function _baseURI() override view internal returns (string memory) {
         return baseURI;

@@ -36,6 +36,12 @@ pub async fn start_listener(pool: Pool) -> Result<()> {
 
     while let Some(res) = stream.next().await {
         let (event, _) = res?;
+        let from = event.from;
+        if from != ethers::types::Address::zero() {
+            // Only mint events
+            continue;
+        }
+
         let to = format!("{:#x}", event.to);
         let token_id = event.token_id.to_string();
 
