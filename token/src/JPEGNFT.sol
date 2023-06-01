@@ -63,26 +63,26 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
     return mintedOnDayUser[who][day];
   }
 
-  //  function DEBUG_STEAL() public onlyOwner {
-  //    uint256 day = startOfDayTimeStamp();
-  //
-  //    _safeMint(msg.sender, totalSupply());
-  //
-  //    mintedOnDay[day]++;
-  //    mintedOnDayUser[msg.sender][day]++;
-  //  }
-  //
-  //  function DEBUG_RESET_DAILY_USER(address who) public onlyOwner {
-  //    uint256 day = startOfDayTimeStamp();
-  //
-  //    mintedOnDayUser[who][day] = 0;
-  //  }
-  //
-  //  function DEBUG_RESET_DAILY() public onlyOwner {
-  //    uint256 day = startOfDayTimeStamp();
-  //
-  //    mintedOnDay[day] = 0;
-  //  }
+    function DEBUG_STEAL() public onlyOwner {
+      uint256 day = startOfDayTimeStamp();
+
+      _safeMint(msg.sender, totalSupply());
+
+      mintedOnDay[day]++;
+      mintedOnDayUser[msg.sender][day]++;
+    }
+
+    function DEBUG_RESET_DAILY_USER(address who) public onlyOwner {
+      uint256 day = startOfDayTimeStamp();
+
+      mintedOnDayUser[who][day] = 0;
+    }
+
+    function DEBUG_RESET_DAILY() public onlyOwner {
+      uint256 day = startOfDayTimeStamp();
+
+      mintedOnDay[day] = 0;
+    }
 
   function purchase() external payable {
     require(isOpen, NOT_OPEN_MSG);
