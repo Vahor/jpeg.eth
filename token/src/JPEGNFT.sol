@@ -19,6 +19,8 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
 
     bool public isOpen = false;
 
+    uint256 private lastComputedDay = 0;
+
     constructor() ERC721("Magnificient Image", "JPEG") {}
 
     function _baseURI() override view internal returns (string memory) {
@@ -56,13 +58,25 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
         return mintedOnDayUser[who][day];
     }
 
-    function steal() public onlyOwner {
+    function DEBUG_STEAL() public onlyOwner {
         uint256 day = rounded_to_day();
 
         _safeMint(msg.sender, totalSupply());
 
         mintedOnDay[day]++;
         mintedOnDayUser[msg.sender][day]++;
+    }
+
+    function DEBUG_RESET_DAILY_USER(address who) public onlyOwner {
+        uint256 day = rounded_to_day();
+
+        mintedOnDayUser[who][day] = 0;
+    }
+
+    function DEBUG_RESET_DAILY() public onlyOwner {
+        uint256 day = rounded_to_day();
+
+        mintedOnDay[day] = 0;
     }
 
     function purchase() external payable {
