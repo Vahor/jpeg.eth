@@ -1,14 +1,12 @@
-use std::path::PathBuf;
-
 use actix_files::NamedFile;
 use actix_web::http::header::{ContentDisposition, DispositionType};
 use actix_web::{get, web, Error as AWError, HttpRequest, HttpResponse};
 use log::{debug, warn};
 
 use db::Pool;
+use utils::env_helpers::cast_required_env_var;
 
 use crate::db;
-use crate::env_helpers::cast_required_env_var;
 use crate::image::ImageMetadata;
 
 #[get("/data")]
@@ -68,12 +66,9 @@ pub async fn get_image(
     }
 
     let result = result.unwrap();
+    let resource_dir = cast_required_env_var::<String>("RESOURCE_DIR");
 
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let manifest_dir = PathBuf::from(manifest_dir);
-
-    let image_path = format!("resources/images/{}.png", result.image_id);
-    let image_path = manifest_dir.join(image_path);
+    let image_path = format!("{}/output/{}.png", resource_dir, result.image_id);
 
     let file = NamedFile::open(image_path)?;
 

@@ -28,3 +28,7 @@ This will create a `app.db` file (sqlite3) in the `resources` folder.
 ### Load images
 
 When all images are generated, copy the content of output folder of `generator/resources/output` into `server/resources/images`.
+
+### Run
+
+Currently e

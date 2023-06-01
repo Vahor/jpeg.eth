@@ -1,5 +1,4 @@
 use std::io;
-use std::path::PathBuf;
 
 use actix_web::{middleware, web, App, HttpServer};
 use log::info;
@@ -7,19 +6,17 @@ use r2d2_sqlite::{self, SqliteConnectionManager};
 
 use db::Pool;
 
-use crate::env_helpers::{cast_required_env_var, set_default_env_var};
+use utils::env_helpers::{cast_required_env_var, set_default_env_var};
 use crate::image::load_images;
 
 mod db;
-mod env_helpers;
 pub mod image;
 mod listener;
 mod image_routes;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let manifest_dir = PathBuf::from(manifest_dir);
+    let resource_dir = cast_required_env_var::<String>("RESOURCE_DIR");
 
     set_default_env_var("RUST_LOG", "debug");
     env_logger::init();
@@ -30,7 +27,7 @@ async fn main() -> io::Result<()> {
     let port = cast_required_env_var::<u16>("PORT");
     let host = cast_required_env_var::<String>("HOST");
 
-    let manager = SqliteConnectionManager::file(manifest_dir.join("resources/app.db"));
+    let manager = SqliteConnectionManager::file(format!("{}/app.db", resource_dir));
 
     let pool = Pool::new(manager).unwrap();
 

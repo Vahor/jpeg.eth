@@ -7,7 +7,7 @@ use ethers::providers::{Provider, StreamExt, Ws};
 use log::info;
 
 use crate::db::{assign_image, get_random_unassigned_image, Pool};
-use crate::env_helpers::cast_required_env_var;
+use utils::env_helpers::cast_required_env_var;
 
 abigen!(
     ERC721,

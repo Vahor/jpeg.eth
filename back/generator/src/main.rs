@@ -1,8 +1,9 @@
-use std::path::PathBuf;
-use std::{env, fs};
+use std::fs;
 
 use rayon::prelude::*;
 use serde::{Deserialize, Serialize};
+
+use utils::env_helpers::cast_required_env_var;
 
 use crate::generator::{combine_images, create_combination};
 use crate::layer::ArtLayer;
@@ -18,11 +19,11 @@ pub struct Config {
 }
 
 fn main() {
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let manifest_dir = PathBuf::from(manifest_dir);
-    let input_folder = &manifest_dir.join("resources/input");
+    let resource_dir = cast_required_env_var::<String>("RESOURCE_DIR");
+    let input_folder = &*format!("{}/input", resource_dir);
+    let config_path = &*format!("{}/generator_config.json", resource_dir);
+    let output_folder = &*format!("{}/output", resource_dir);
 
-    let config_path = &manifest_dir.join("resources/config.json");
     let config = serde_json::from_str::<Config>(
         &fs::read_to_string(config_path).expect("Error reading config file"),
     )
@@ -30,7 +31,6 @@ fn main() {
 
     let folders = fs::read_dir(input_folder).expect("Error reading input folder");
 
-    let output_folder = &manifest_dir.join("resources/output");
     fs::create_dir_all(output_folder).expect("Error creating output folder");
 
     let mut layers = Vec::new();
@@ -60,8 +60,8 @@ fn main() {
     // Combine all images
     combinations.par_iter().for_each(|combination| {
         let image = combine_images(combination, &config);
-        let image_path = output_folder.join(format!("{}.png", image.hash));
-        let json_path = output_folder.join(format!("{}.json", image.hash));
+        let image_path = format!("{}/{}.png", output_folder, image.hash);
+        let json_path = format!("{}/{}.json", output_folder, image.hash);
 
         let attribute_str =
             serde_json::to_string(&image.attributes).expect("Error serializing attributes");

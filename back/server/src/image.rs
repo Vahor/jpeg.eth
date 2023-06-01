@@ -1,10 +1,10 @@
-use std::path::PathBuf;
-
 use fake::faker::lorem::en::{Paragraph, Word};
 use fake::Fake;
+use log::info;
 use serde::{Deserialize, Serialize, Serializer};
 
 use db::Pool;
+use utils::env_helpers::cast_required_env_var;
 
 use crate::db;
 use crate::db::register_image;
@@ -46,27 +46,23 @@ where
 }
 
 pub fn load_images(pool: &Pool) {
-    let manifest_dir = env!("CARGO_MANIFEST_DIR");
-    let manifest_dir = PathBuf::from(manifest_dir);
+    let resource_dir = cast_required_env_var::<String>("RESOURCE_DIR");
 
-    let images_dir = manifest_dir.join("resources/images");
+    let images_dir = format!("{}/output", resource_dir);
+
+    info!("Loading images from {}", images_dir);
 
     // Load all images in output folder, and insert in db if not already there
     let images = std::fs::read_dir(images_dir).unwrap();
 
-    // get only .png files as .json have the same name
-    let images = images.filter(|entry| {
-        if let Ok(entry) = entry {
-            if let Some(file_name) = entry.file_name().to_str() {
-                return file_name.ends_with(".png");
-            }
-        }
-        false
-    });
-
     for image in images {
         if let Ok(image) = image {
             if let Some(file_name) = image.file_name().to_str() {
+                // Skip .json files
+                if !file_name.ends_with(".png") {
+                    continue;
+                }
+
                 let image_id = file_name.replace(".png", "");
                 let attributes_path = image.path().with_extension("json");
 
