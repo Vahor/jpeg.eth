@@ -43,7 +43,7 @@ contract LegendoraNFTTest is Test {
 
     function open() public {
         vm.startPrank(owner);
-        token.setActive(true);
+        token.setOpen(true);
         assertEq(token.isOpen(), true);
         vm.stopPrank();
     }
