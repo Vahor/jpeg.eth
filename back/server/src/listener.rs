@@ -17,7 +17,7 @@ abigen!(
 );
 
 pub async fn start_listener(pool: Pool) -> Result<()> {
-    let host = cast_required_env_var::<String>("WSS_URL");
+    let host = cast_required_env_var::<String>("ALCHEMY_WSS_URL");
     let contract_address = cast_required_env_var::<String>("CONTRACT_ADDRESS");
 
     let client: Provider<Ws> = Provider::<Ws>::connect(host).await?;
