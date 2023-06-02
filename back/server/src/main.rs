@@ -34,7 +34,7 @@ async fn main() -> io::Result<()> {
     // Init images
     load_images(&pool);
 
-    info!("starting HTTP server at http://localhost:8080");
+    info!("starting HTTP server at http://{}:{}", host, port);
 
     let listener = listener::start_listener(pool.clone());
     tokio::spawn(listener);
