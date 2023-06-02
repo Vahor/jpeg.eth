@@ -1,4 +1,4 @@
-import {createConfig} from "wagmi";
+import {createConfig, sepolia} from "wagmi";
 import {getDefaultConfig} from "connectkit";
 
 const config = createConfig(
@@ -7,6 +7,8 @@ const config = createConfig(
         walletConnectProjectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
 
         appName: "JPEG Explorer",
+
+        chains: [sepolia]
     }),
 );
 
