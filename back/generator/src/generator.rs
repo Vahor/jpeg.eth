@@ -66,7 +66,7 @@ pub fn combine_images(
     hasher.update(format!("{:?}", attributes).as_bytes());
     let hash = hasher.finalize();
 
-    let attributes: Vec<Attribute> = attributes.into_iter().map(|(k, v)| {
+    let attributes = attributes.into_iter().map(|(k, v)| {
         Attribute {
             trait_type: k,
             value: v,

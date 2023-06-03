@@ -1,0 +1,21 @@
+- Clear image output
+- Clear db
+- Run init db script (./back/resources/db/setup.sh)
+- Build images
+- Deploy token
+- Go to `https://sepolia.etherscan.io/address/...`
+  - Update baseURI with the ngrok url (add /data/ at the end, ex: https://0fa5-2a01-e0a-1a8-bb90-508c-6f11-7a40-3518.ngrok-free.app/data/)
+- Start ngrok
+  - Get url
+- Update env variables
+- Start server
+- Start front app
+  - You go to the inventory page, you'll see that it's empty
+- Purchase (min price is 0.0001 ETH)
+  - This won't work as the sell is not open
+- use the setOpen function (set to true)
+- Purchase
+  - This will work
+  - You should see a log message in the server => event has been received, we are registering the transaction
+    - and many logs in ngrok, that means that people are validating the transaction
+  - Go back to the inventory page, you should see the new token

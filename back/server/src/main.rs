@@ -1,4 +1,5 @@
 use std::io;
+use actix_cors::Cors;
 
 use actix_web::{middleware, web, App, HttpServer};
 use log::info;
@@ -34,7 +35,7 @@ async fn main() -> io::Result<()> {
     // Init images
     load_images(&pool);
 
-    info!("starting HTTP server at http://localhost:8080");
+    info!("starting HTTP server at http://{}:{}", host, port);
 
     let listener = listener::start_listener(pool.clone());
     tokio::spawn(listener);
@@ -42,7 +43,14 @@ async fn main() -> io::Result<()> {
     HttpServer::new({
         let pool = pool.clone();
         move || {
+            let cors = Cors::default()
+                .allow_any_origin()
+                .allowed_methods(vec!["GET", "POST"])
+                .allow_any_header()
+                .max_age(3600);
+
             App::new()
+                .wrap(cors)
                 .wrap(middleware::Logger::default())
                 .app_data(web::Data::new(pool.clone()))
                 .service(image_routes::get_metadata)

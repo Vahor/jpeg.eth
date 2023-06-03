@@ -13,7 +13,7 @@ mod layer;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Config {
-    version: u16,
+    version: u8,
     input_size: u32,
     output_size: u32,
 }
