@@ -90,6 +90,9 @@ contract JPEFNFTTtest is Test {
 
     }
 
+    // write a test limit global
+
+
     function test_uri() public  {
         open();
 

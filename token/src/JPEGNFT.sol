@@ -84,7 +84,7 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
         uint256 day = startOfDayTimestamp();
 
         require(_mintedTodayGlobal(day) < maxPerDay, MAX_DAILY_MSG);
-        require(_mintedTodayUser(msg.sender, day) < maxPerDayAndUser, MAX_DAILY_USER_MSG);
+        // We are checking _mintedTodayUser in beforeTokenTransfer
 
         _safeMint(msg.sender, totalSupply());
 
@@ -95,6 +95,20 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
     function setOpen(bool state) public onlyOwner {
         require(state != isOpen, SAME_ACTIVE_STATE_MSG);
         isOpen = state;
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 firstTokenId,
+        uint256 batchSize
+    ) internal virtual override {
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+
+        uint256 day = startOfDayTimestamp();
+
+        // In any case it's illegal to have more than 1 transfer per day per user
+        require(_mintedTodayUser(msg.sender, day) < maxPerDayAndUser, MAX_DAILY_USER_MSG);
     }
 
 
