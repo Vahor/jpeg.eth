@@ -14,7 +14,10 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
 
     string public baseURI;
 
+    /// Only counts minted tokens
     mapping(uint256 => uint8) public mintedOnDay;
+
+    /// Counts minted tokens and transfers
     mapping(address => mapping(uint256 => uint8)) public mintedOnDayUser;
 
     bool public isOpen = false;
@@ -44,17 +47,10 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
         return mintedOnDay[startOfDayTimestamp()];
     }
 
-    function _mintedTodayGlobal(uint256 day) private view returns (uint8)  {
-        return mintedOnDay[day];
-    }
-
     function mintedTodayUser(address who) public view returns (uint8)  {
         return mintedOnDayUser[who][startOfDayTimestamp()];
     }
 
-    function _mintedTodayUser(address who, uint256 day) private view returns (uint8)  {
-        return mintedOnDayUser[who][day];
-    }
 
     function DEBUG_STEAL() public onlyOwner {
         uint256 day = startOfDayTimestamp();
@@ -81,20 +77,36 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
         require(isOpen, NOT_OPEN_MSG);
         require(msg.value >= price, POOR_MSG);
 
-        uint256 day = startOfDayTimestamp();
-
-        require(_mintedTodayGlobal(day) < maxPerDay, MAX_DAILY_MSG);
-        require(_mintedTodayUser(msg.sender, day) < maxPerDayAndUser, MAX_DAILY_USER_MSG);
+        require(mintedTodayGlobal() < maxPerDay, MAX_DAILY_MSG);
+        // We are checking mintedTodayUser in beforeTokenTransfer
 
         _safeMint(msg.sender, totalSupply());
 
-        mintedOnDay[day]++;
-        mintedOnDayUser[msg.sender][day]++;
+        mintedOnDay[startOfDayTimestamp()]++;
     }
 
     function setOpen(bool state) public onlyOwner {
         require(state != isOpen, SAME_ACTIVE_STATE_MSG);
         isOpen = state;
+    }
+
+    function _beforeTokenTransfer(
+        address from,
+        address to,
+        uint256 firstTokenId,
+        uint256 batchSize
+    ) internal virtual override {
+        super._beforeTokenTransfer(from, to, firstTokenId, batchSize);
+
+        // In any case it's illegal to have more than 1 transfer per day per user
+        require(mintedTodayUser(to) < maxPerDayAndUser, MAX_DAILY_USER_MSG);
+    }
+
+    function _afterTokenTransfer(address from, address to, uint256 firstTokenId, uint256 batchSize) internal virtual override {
+        super._afterTokenTransfer(from, to, firstTokenId, batchSize);
+
+        // Increase the counter for the user, for minted and transferred tokens
+        mintedOnDayUser[to][startOfDayTimestamp()]++;
     }
 
 
