@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {ERC721} from "openzeppelin-contracts/contracts/token/ERC721/ERC721.sol";
 import {ERC721Enumerable} from "openzeppelin-contracts/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import {Ownable} from "openzeppelin-contracts/contracts/access/Ownable.sol";
-import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, DAY_MS, SAME_ACTIVE_STATE_MSG} from "./constants.sol";
+import {POOR_MSG, NOT_OPEN_MSG, MAX_DAILY_MSG, MAX_DAILY_USER_MSG, SECONDS_PER_DAY, SAME_ACTIVE_STATE_MSG} from "./constants.sol";
 
 
 contract JPEGNFT is ERC721Enumerable, Ownable {
