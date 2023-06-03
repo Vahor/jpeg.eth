@@ -8,4 +8,4 @@ string constant MAX_DAILY_MSG = "Max daily";
 string constant MAX_DAILY_USER_MSG = "Max daily user";
 string constant SAME_ACTIVE_STATE_MSG = "Already in this state";
 
-uint256 constant MS_PER_DAY = 86400000;
+uint256 constant SECONDS_PER_DAY = 86400;
