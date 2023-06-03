@@ -125,5 +125,16 @@ contract JPEFNFTTtest is Test {
 
     }
 
+    function test_already_open() public {
+        vm.startPrank(owner);
+        vm.expectRevert(abi.encodePacked(SAME_ACTIVE_STATE_MSG));
+        token.setOpen(false);
+        token.setOpen(true);
+        assertEq(token.isOpen(), true);
+        vm.expectRevert(abi.encodePacked(SAME_ACTIVE_STATE_MSG));
+        token.setOpen(true);
+        vm.stopPrank();
+    }
+
 
 }

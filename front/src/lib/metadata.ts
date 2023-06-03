@@ -9,7 +9,7 @@ export type Metadata = {
 }
 
 export const getMetadata = async (tokenId: string, baseURI: string) => {
-    const metadataURI = `${baseURI}data/${tokenId}`
+    const metadataURI = `${baseURI}${tokenId}`
     const metadata = await fetch(metadataURI)
     return await metadata.json() as Metadata
 }

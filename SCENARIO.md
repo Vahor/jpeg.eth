@@ -1,0 +1,19 @@
+- Clear image output
+- Clear db
+- Build images
+- Start server
+- Start ngrok
+  - Get url
+- Start front app
+  - You can connect and go to the inventory page, you'll see that it's empty
+- Deploy token
+- Go to `https://sepolia.etherscan.io/address/...`
+  - Update baseURI with the ngrok url
+- Purchase
+  - This won't work as the sell is not open
+- use the setOpen function (set to true)
+- Purchase
+  - This will work
+  - You should see a log message in the server => event has been received, we are registering the transaction
+    - and many logs in ngrok, that means that people are validating the transaction
+  - Go back to the inventory page, you should see the new token

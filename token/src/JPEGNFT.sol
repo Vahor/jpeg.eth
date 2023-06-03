@@ -34,14 +34,14 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
         baseURI = value;
     }
 
-    function startOfDayMs() private view returns (uint256) {
+    function startOfDayTimestamp() private view returns (uint256) {
         unchecked {
             return block.timestamp - (block.timestamp % SECONDS_PER_DAY);
         }
     }
 
     function mintedTodayGlobal() public view returns (uint8)  {
-        return mintedOnDay[startOfDayMs()];
+        return mintedOnDay[startOfDayTimestamp()];
     }
 
     function _mintedTodayGlobal(uint256 day) private view returns (uint8)  {
@@ -49,7 +49,7 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
     }
 
     function mintedTodayUser(address who) public view returns (uint8)  {
-        return mintedOnDayUser[who][startOfDayMs()];
+        return mintedOnDayUser[who][startOfDayTimestamp()];
     }
 
     function _mintedTodayUser(address who, uint256 day) private view returns (uint8)  {
@@ -57,7 +57,7 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
     }
 
     function DEBUG_STEAL() public onlyOwner {
-        uint256 day = startOfDayMs();
+        uint256 day = startOfDayTimestamp();
 
         _safeMint(msg.sender, totalSupply());
 
@@ -66,13 +66,13 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
     }
 
     function DEBUG_RESET_DAILY_USER(address who) public onlyOwner {
-        uint256 day = startOfDayMs();
+        uint256 day = startOfDayTimestamp();
 
         mintedOnDayUser[who][day] = 0;
     }
 
     function DEBUG_RESET_DAILY() public onlyOwner {
-        uint256 day = startOfDayMs();
+        uint256 day = startOfDayTimestamp();
 
         mintedOnDay[day] = 0;
     }
@@ -81,7 +81,7 @@ contract JPEGNFT is ERC721Enumerable, Ownable {
         require(isOpen, NOT_OPEN_MSG);
         require(msg.value >= price, POOR_MSG);
 
-        uint256 day = startOfDayMs();
+        uint256 day = startOfDayTimestamp();
 
         require(_mintedTodayGlobal(day) < maxPerDay, MAX_DAILY_MSG);
         require(_mintedTodayUser(msg.sender, day) < maxPerDayAndUser, MAX_DAILY_USER_MSG);
