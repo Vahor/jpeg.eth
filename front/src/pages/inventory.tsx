@@ -34,7 +34,7 @@ export default function Inventory() {
 
             <div>
                 <h1 className="text-2xl font-bold">Inventory</h1>
-                <p className="text-slate-400">You own {ownedTokens.length} NFTs</p>
+                <p className="text-muted-foreground">You own {ownedTokens.length} NFTs</p>
             </div>
 
             <div className="pt-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

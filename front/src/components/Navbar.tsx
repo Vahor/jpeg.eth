@@ -18,6 +18,9 @@ const Navbar = () => {
                             <li className="text-black/80 hover:text-black/90 cursor-pointer">
                                 <Link href={"/inventory"}>Inventory</Link>
                             </li>
+                            <li className="text-black/80 hover:text-black/90 cursor-pointer">
+                                <Link href={"/faucet"}>Faucet</Link>
+                            </li>
                         </ul>
                     </div>
                 </div>
