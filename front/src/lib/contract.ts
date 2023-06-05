@@ -1,4 +1,7 @@
 import {erc721ABI} from "wagmi";
+import {erc20ABI} from "wagmi";
+
+export const mewoContractABI = [...erc20ABI] as const;
 
 export const nftContractABI = [
     ...erc721ABI,
@@ -98,4 +101,5 @@ export const faucetContractABI = [
 
 
 export const nftContractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS! as `0x${string}`
+export const mewoContractAddress = process.env.NEXT_PUBLIC_MEWO_CONTRACT_ADDRESS! as `0x${string}`
 export const faucetContractAddress = process.env.NEXT_PUBLIC_FAUCET_CONTRACT_ADDRESS! as `0x${string}`

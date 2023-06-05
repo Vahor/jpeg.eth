@@ -1,4 +1,10 @@
-import {faucetContractABI, faucetContractAddress, nftContractABI, nftContractAddress} from "@/lib/contract";
+import {
+    faucetContractABI,
+    faucetContractAddress, mewoContractABI,
+    mewoContractAddress,
+    nftContractABI,
+    nftContractAddress
+} from "@/lib/contract";
 import {wagmiConfig} from "@/lib/wagmi/index";
 
 export const getBaseURI = async () => {
@@ -42,4 +48,14 @@ export const getMaxMintFaucet = async () => {
         abi: faucetContractABI,
         functionName: 'MAX_MINT'
     });
+}
+
+
+export const getMewoBalance = async (address: Web3Address) => {
+    return await wagmiConfig.publicClient.readContract({
+        address: mewoContractAddress,
+        abi: mewoContractABI,
+        functionName: 'balanceOf',
+        args: [address]
+    })
 }

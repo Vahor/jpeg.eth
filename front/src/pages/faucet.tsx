@@ -1,11 +1,12 @@
 import {useAccount, useContractWrite, usePrepareContractWrite} from "wagmi";
 import {useEffect, useState} from "react";
 import toast from "react-hot-toast";
-import {getLastMintedFaucet, getMaxMintFaucet} from "@/lib/wagmi/utils";
+import {getLastMintedFaucet, getMaxMintFaucet, getMewoBalance} from "@/lib/wagmi/utils";
 import {faucetContractABI, faucetContractAddress} from "@/lib/contract";
 import {useRouter} from "next/router";
 import dayjs from "dayjs";
 import {Button} from "@/components/ui/button";
+import {formatEther} from "viem";
 
 const relativeTime = require('dayjs/plugin/relativeTime');
 dayjs.extend(relativeTime);
@@ -16,6 +17,7 @@ export default function Inventory() {
     const {push} = useRouter();
     const {address} = useAccount()
 
+    const [balance, setBalance] = useState<bigint | 0n>(defaultLastMinted)
     const [lastMintedDate, setLastMintedDate] = useState<number | 0>(0)
     const [requestToken, setRequestToken] = useState<bigint | 0n>(defaultLastMinted)
     const canUseFaucet = address && (lastMintedDate === 0 || dayjs(lastMintedDate).add(30, 'minute').isBefore(dayjs()));
@@ -72,10 +74,12 @@ export default function Inventory() {
         if (address) {
             Promise.all([
                 getLastMintedFaucet(address),
-                getMaxMintFaucet()
-            ]).then(([lastMinted, requestToken]) => {
+                getMaxMintFaucet(),
+                getMewoBalance(address),
+            ]).then(([lastMinted, requestToken, balance]) => {
                 setLastMintedDate(Number.parseInt(lastMinted.toString() + '000'))
                 setRequestToken(requestToken)
+                setBalance(balance)
             }).catch((e) => {
                 console.error(e);
                 toast.error("Failed to load faucet history")
@@ -109,6 +113,13 @@ export default function Inventory() {
                 >
                     {(isLoading || writeLoading) ? "Loading..." : `GIVE ME ${requestToken} COINS`}
                 </Button>
+            </div>
+
+            <hr className="my-2"/>
+
+            <div>
+                <h2>Balance :</h2>
+                <p>{formatEther(balance)} MEWO</p>
             </div>
 
 
